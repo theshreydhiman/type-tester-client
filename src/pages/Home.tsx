@@ -73,8 +73,8 @@ export default function Home() {
   if (phase === 'done') {
     return (
       <div className="relative min-h-[calc(100vh-65px)] overflow-hidden" style={{ background: 'var(--bg)' }}>
-        <div className="absolute pointer-events-none" style={{ width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,109,250,0.12), transparent)', filter: 'blur(80px)', top: '-100px', left: '-100px', animation: 'orbFloat 12s ease-in-out infinite' }} />
-        <div className="absolute pointer-events-none" style={{ width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(250,109,143,0.08), transparent)', filter: 'blur(80px)', bottom: '-50px', right: '100px', animation: 'orbFloat 16s ease-in-out infinite reverse' }} />
+        <div className="absolute pointer-events-none" style={{ width: 'min(500px, 80vw)', height: 'min(500px, 80vw)', borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,109,250,0.12), transparent)', filter: 'blur(80px)', top: '-100px', left: '-100px', animation: 'orbFloat 12s ease-in-out infinite' }} />
+        <div className="absolute pointer-events-none" style={{ width: 'min(400px, 70vw)', height: 'min(400px, 70vw)', borderRadius: '50%', background: 'radial-gradient(circle, rgba(250,109,143,0.08), transparent)', filter: 'blur(80px)', bottom: '-50px', right: '100px', animation: 'orbFloat 16s ease-in-out infinite reverse' }} />
         <div className="relative z-10 flex flex-col items-center justify-start px-4 py-10 max-w-4xl mx-auto">
           <ResultsModal result={result!} onReset={reset} previousBest={previousBest} />
         </div>
@@ -85,15 +85,24 @@ export default function Home() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-[calc(100vh-65px)] overflow-hidden" style={{ background: 'var(--bg)' }}>
       {/* Ambient orbs */}
-      <div className="absolute pointer-events-none" style={{ width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,109,250,0.15), transparent)', filter: 'blur(100px)', top: '-150px', left: '-100px', animation: 'orbFloat 14s ease-in-out infinite' }} />
-      <div className="absolute pointer-events-none" style={{ width: '350px', height: '350px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(250,109,143,0.1), transparent)', filter: 'blur(80px)', bottom: '-80px', right: '80px', animation: 'orbFloat 18s ease-in-out infinite reverse' }} />
+      <div className="absolute pointer-events-none" style={{ width: 'min(500px, 80vw)', height: 'min(500px, 80vw)', borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,109,250,0.15), transparent)', filter: 'blur(100px)', top: '-150px', left: '-100px', animation: 'orbFloat 14s ease-in-out infinite' }} />
+      <div className="absolute pointer-events-none" style={{ width: 'min(350px, 60vw)', height: 'min(350px, 60vw)', borderRadius: '50%', background: 'radial-gradient(circle, rgba(250,109,143,0.1), transparent)', filter: 'blur(80px)', bottom: '-80px', right: '80px', animation: 'orbFloat 18s ease-in-out infinite reverse' }} />
 
       <div className="relative z-10 w-full max-w-3xl px-4">
         {/* Idle hint */}
         {phase === 'idle' && (
-          <p className="text-center text-sm mb-8 animate-fadeIn" style={{ fontFamily: 'Space Mono, monospace', color: 'var(--text-dim)', letterSpacing: '0.1em' }}>
-            start typing to begin · {modeLabel}
-          </p>
+          <div className="text-center mb-8 animate-fadeIn">
+            <p className="text-sm" style={{ fontFamily: 'Space Mono, monospace', color: 'var(--text-dim)', letterSpacing: '0.1em' }}>
+              start typing to begin · {modeLabel}
+            </p>
+            <button
+              className="sm:hidden mt-3 px-5 py-2 rounded-full text-xs cursor-pointer border-0"
+              style={{ fontFamily: 'Space Mono, monospace', background: 'rgba(124,109,250,0.12)', border: '1px solid rgba(124,109,250,0.25)', color: 'var(--accent)', letterSpacing: '0.1em' }}
+              onClick={() => inputRef.current?.focus()}
+            >
+              tap to type
+            </button>
+          </div>
         )}
 
         {/* Live stats */}

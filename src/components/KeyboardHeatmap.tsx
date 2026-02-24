@@ -60,7 +60,8 @@ export default function KeyboardHeatmap({ charErrors, totalChars }: Props) {
       >
         Keyboard Heatmap
       </h3>
-      <div className="flex flex-col gap-1.5">
+      <div className="overflow-x-auto pb-1">
+      <div className="flex flex-col gap-1.5" style={{ minWidth: 'max-content' }}>
         {KEYBOARD_ROWS.map((row, rowIdx) => (
           <div
             key={rowIdx}
@@ -116,6 +117,7 @@ export default function KeyboardHeatmap({ charErrors, totalChars }: Props) {
             space
           </div>
         </div>
+      </div>
       </div>
 
       {/* Legend */}

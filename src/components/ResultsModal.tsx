@@ -17,8 +17,8 @@ interface Props {
 
 function BigStat({ value, unit, color }: { value: string | number; unit: string; color: string }) {
   return (
-    <div className="flex flex-col gap-1.5 px-6 py-6" style={{ background: 'var(--surface2)' }}>
-      <div className="leading-none font-bold" style={{ fontFamily: 'Syne, sans-serif', fontSize: '48px', letterSpacing: '-0.04em', color }}>
+    <div className="flex flex-col gap-1 sm:gap-1.5 px-4 sm:px-6 py-4 sm:py-6" style={{ background: 'var(--surface2)' }}>
+      <div className="text-3xl sm:text-5xl leading-none font-bold" style={{ fontFamily: 'Syne, sans-serif', letterSpacing: '-0.04em', color }}>
         {value}
       </div>
       <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '10px', letterSpacing: '0.15em', color: 'var(--text-dim)', textTransform: 'uppercase' }}>

@@ -28,7 +28,7 @@ export default function WordDisplay({ words, currentWordIdx, currentInput }: Pro
       style={{ height: '160px' }}
     >
       <div
-        className="flex flex-wrap gap-x-3 gap-y-2 text-2xl leading-[3rem]"
+        className="flex flex-wrap gap-x-3 gap-y-2 text-xl sm:text-2xl leading-[3rem]"
         style={{ fontFamily: 'Space Mono, monospace' }}
       >
         {words.map((wordState, wIdx) => {
