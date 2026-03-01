@@ -102,13 +102,13 @@ export default function ResultsModal({ result, onReset, previousBest }: Props) {
             New Personal Best!
           </div>
         )}
-        <h2 className="font-bold leading-tight" style={{ fontFamily: 'Syne, sans-serif', fontSize: '36px', letterSpacing: '-0.03em' }}>
+        <h2 className="font-bold leading-tight text-2xl sm:text-4xl" style={{ fontFamily: 'Syne, sans-serif', letterSpacing: '-0.03em' }}>
           You typed{' '}
           <span style={{ background: 'linear-gradient(135deg, var(--accent3), var(--accent))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             {result.wpm} WPM
           </span>
           {wpmDiff !== null && (
-            <span className="ml-3" style={{ fontFamily: 'Space Mono, monospace', color: wpmDiff >= 0 ? 'var(--accent3)' : 'var(--accent2)', fontSize: '18px', WebkitTextFillColor: 'unset' }}>
+            <span className="ml-2 text-base sm:text-lg" style={{ fontFamily: 'Space Mono, monospace', color: wpmDiff >= 0 ? 'var(--accent3)' : 'var(--accent2)', WebkitTextFillColor: 'unset' }}>
               {wpmDiff >= 0 ? `+${wpmDiff}` : wpmDiff} vs best
             </span>
           )}
@@ -119,7 +119,7 @@ export default function ResultsModal({ result, onReset, previousBest }: Props) {
       </div>
 
       {/* Big stats */}
-      <div className="grid grid-cols-4 mb-5 overflow-hidden" style={{ borderRadius: '16px', gap: '2px', background: 'var(--border)' }}>
+      <div className="grid grid-cols-2 sm:grid-cols-4 mb-5 overflow-hidden" style={{ borderRadius: '16px', gap: '2px', background: 'var(--border)' }}>
         <BigStat value={result.wpm} unit="WPM" color="#f5c842" />
         <BigStat value={result.rawWpm} unit="Raw WPM" color="var(--accent3)" />
         <BigStat value={`${result.accuracy}%`} unit="Accuracy" color="var(--accent)" />
@@ -127,7 +127,7 @@ export default function ResultsModal({ result, onReset, previousBest }: Props) {
       </div>
 
       {/* Chart + Heatmap */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div className="rounded-xl p-5" style={{ background: 'var(--surface2)', border: '1px solid var(--border)' }}>
           <WpmChart wpmTimeline={result.wpmTimeline} />
         </div>

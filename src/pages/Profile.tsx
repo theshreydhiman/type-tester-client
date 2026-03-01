@@ -179,7 +179,7 @@ export default function Profile() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-10 space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-4">
           <div
             className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-base"
@@ -202,7 +202,7 @@ export default function Profile() {
           </div>
         </div>
         {last && (
-          <div className="text-right flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:justify-end">
             <span style={{ fontSize: '12px', color: 'var(--text-dim)', fontFamily: 'Space Mono, monospace' }}>
               Last test:
             </span>

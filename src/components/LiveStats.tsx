@@ -68,10 +68,10 @@ export default function LiveStats({ wpm, accuracy, timeLeft, phase, duration, mo
   }
 
   return (
-    <div className="flex items-center justify-center gap-10">
+    <div className="flex items-center justify-center gap-6 sm:gap-10">
       {/* Radial ring */}
-      <div className="relative" style={{ width: 100, height: 100, flexShrink: 0 }}>
-        <svg width="100" height="100" viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)' }}>
+      <div className="relative w-20 h-20 sm:w-[100px] sm:h-[100px]" style={{ flexShrink: 0 }}>
+        <svg width="100%" height="100%" viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)' }}>
           <defs>
             <filter id="timerGlow">
               <feGaussianBlur stdDeviation="2.5" result="blur" />
@@ -113,27 +113,27 @@ export default function LiveStats({ wpm, accuracy, timeLeft, phase, duration, mo
       </div>
 
       {/* Stats */}
-      <div className="flex items-center gap-8">
+      <div className="flex items-center gap-5 sm:gap-8">
         <div className="flex flex-col items-center gap-1">
-          <span className="leading-none font-bold" style={{ fontFamily: 'Syne, sans-serif', fontSize: '36px', color: phase === 'running' ? 'var(--accent)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
+          <span className="text-2xl sm:text-4xl leading-none font-bold" style={{ fontFamily: 'Syne, sans-serif', color: phase === 'running' ? 'var(--accent)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
             {phase === 'running' ? wpm : '--'}
           </span>
           <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '9px', color: 'var(--text-dim)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>WPM</span>
         </div>
 
-        <div style={{ width: '1px', height: '40px', background: 'var(--border)' }} />
+        <div style={{ width: '1px', height: '36px', background: 'var(--border)' }} />
 
         <div className="flex flex-col items-center gap-1">
-          <span className="leading-none font-bold" style={{ fontFamily: 'Syne, sans-serif', fontSize: '36px', color: phase === 'running' ? 'var(--text)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
+          <span className="text-2xl sm:text-4xl leading-none font-bold" style={{ fontFamily: 'Syne, sans-serif', color: phase === 'running' ? 'var(--text)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
             {phase === 'running' ? `${accuracy}%` : '--'}
           </span>
           <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '9px', color: 'var(--text-dim)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>ACC</span>
         </div>
 
-        <div style={{ width: '1px', height: '40px', background: 'var(--border)' }} />
+        <div style={{ width: '1px', height: '36px', background: 'var(--border)' }} />
 
         <div className="flex flex-col items-center gap-1">
-          <span className="leading-none font-bold" style={{ fontFamily: 'Syne, sans-serif', fontSize: '36px', color: 'var(--text-dim)' }}>
+          <span className="text-2xl sm:text-4xl leading-none font-bold" style={{ fontFamily: 'Syne, sans-serif', color: 'var(--text-dim)' }}>
             {thirdVal}
           </span>
           <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '9px', color: 'var(--text-dim)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
