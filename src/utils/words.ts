@@ -176,7 +176,7 @@ export const ABUSIVE_WORDS = [
   "fag", "faggot", "fags", "fanny", "fart", "fuck", "fucked", "fucker", "fuckface", "fuckhead",
   "fucking", "fuckoff", "fucks", "gangbang", "gay", "goddamn", "hell", "homo", "horny", "jizz",
   "jizzed", "knob", "labia", "minger", "motherfucker", "muff", "nazi", "nigga", "nigger", "orgasm",
-  "penis", "piss", "pissed", "poop", "porn", "prick", "pube", "pussy", "queer", "rape", "retard",
+  "penis", "piss", "pissed", "poop", "porn", "prick", "pube", "pussy", "queer", "retard",
   "rimjob", "scrotum", "semen", "sex", "shit", "shite", "shithead", "shitting", "shitty", "skank",
   "slag", "slut", "spastic", "spic", "suck", "tit", "tits", "titties", "tosser", "turd", "twat", "vagina",
   "wank", "wanker", "whore", "wtf", "xxx", "fuk", "fck", "fuking", "fukin", "shithead", "asswhole",

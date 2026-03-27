@@ -74,6 +74,7 @@ export function useTypingTest(settings: HookSettings) {
   const totalCharsRef = useRef(0);
   const charErrorsRef = useRef<Record<string, number>>({});
   const charSubsRef = useRef<Record<string, Record<string, number>>>({});
+  const wordsRef = useRef<WordState[]>([]);
 
   // Stable initWords — always uses latest settings from ref
   const initWords = useCallback(() => {
@@ -104,7 +105,9 @@ export function useTypingTest(settings: HookSettings) {
     //   timed → full duration (will count down)
     //   words/zen → 0 (will count up)
     setTimeLeft(isFinite(duration) ? duration : mode === 'words' ? 0 : 0);
-    setWords(initWords());
+    const initialWords = initWords();
+    wordsRef.current = initialWords;
+    setWords(initialWords);
     setPhase('idle');
     setCurrentWordIdx(0);
     setCurrentInput('');
@@ -230,24 +233,40 @@ export function useTypingTest(settings: HookSettings) {
   const handleInput = useCallback((value: string) => {
     if (phaseRef.current === 'done') return;
 
-    setWords(prev => {
-      const wordIdx = currentWordIdx;
-      if (wordIdx >= prev.length) return prev;
+    const wordIdx = currentWordIdx;
+    const currentWord = wordsRef.current[wordIdx];
+    if (!currentWord) return;
 
-      const updated = [...prev];
-      const word: WordState = {
-        ...prev[wordIdx],
-        chars: prev[wordIdx].chars.map(c => ({ ...c })),
-      };
-      updated[wordIdx] = word;
+    if (phaseRef.current === 'idle' && value.length > 0) {
+      startTimer();
+    }
 
-      if (phaseRef.current === 'idle' && value.length > 0) {
-        startTimer();
+    // Space pressed — complete the word
+    if (value.endsWith(' ')) {
+      const typed = value.trimEnd();
+
+      // Track skipped chars (side effects outside setWords)
+      const skipped = currentWord.word.length - typed.length;
+      if (skipped > 0) {
+        for (let i = typed.length; i < currentWord.word.length; i++) {
+          const expected = currentWord.word[i];
+          charErrorsRef.current[expected] = (charErrorsRef.current[expected] || 0) + 1;
+          totalCharsRef.current += 1;
+        }
       }
 
-      // Space pressed — complete the word
-      if (value.endsWith(' ')) {
-        const typed = value.trimEnd();
+      // Count the space keystroke as a correct character (standard WPM includes spaces)
+      totalCharsRef.current += 1;
+      correctCharsRef.current += 1;
+
+      // Update word display state (pure — no side effects)
+      setWords(prev => {
+        if (wordIdx >= prev.length) return prev;
+        const updated = [...prev];
+        const word: WordState = {
+          ...prev[wordIdx],
+          chars: prev[wordIdx].chars.map(c => ({ ...c })),
+        };
         for (let i = 0; i < word.word.length; i++) {
           if (i < typed.length) {
             word.chars[i].status = typed[i] === word.word[i] ? 'correct' : 'wrong';
@@ -256,67 +275,70 @@ export function useTypingTest(settings: HookSettings) {
           }
         }
         word.status = typed === word.word ? 'correct' : 'wrong';
-
-        // Track skipped chars
-        const skipped = word.word.length - typed.length;
-        if (skipped > 0) {
-          for (let i = typed.length; i < word.word.length; i++) {
-            const expected = word.word[i];
-            charErrorsRef.current[expected] = (charErrorsRef.current[expected] || 0) + 1;
-            totalCharsRef.current += 1;
-          }
-        }
+        updated[wordIdx] = word;
 
         const nextIdx = wordIdx + 1;
         if (nextIdx < updated.length) {
           updated[nextIdx] = { ...updated[nextIdx], status: 'active' };
         }
-
-        // Words mode: advance progress counter and check completion
-        if (settingsRef.current.mode === 'words') {
-          setTimeLeft(nextIdx);
-          if (nextIdx >= settingsRef.current.wordCount) {
-            setTimeout(() => finishTest(), 0);
-          }
-        }
-
-        setCurrentWordIdx(nextIdx);
-        setCurrentInput('');
+        wordsRef.current = updated;
         return updated;
-      }
-
-      // Regular character typing
-      word.chars = word.word.split('').map((c, i) => {
-        if (i < value.length) {
-          return { char: c, status: value[i] === c ? 'correct' : 'wrong' };
-        }
-        return { char: c, status: 'untyped' };
       });
 
-      // Track the last typed character for stats
-      const prevLen = currentInput.length;
-      const newLen = value.length;
-      if (newLen > prevLen) {
-        const charIdx = newLen - 1;
-        const expected = word.word[charIdx] ?? '';
-        const typed = value[charIdx];
-        const correct = typed === expected;
+      const nextIdx = wordIdx + 1;
 
-        totalCharsRef.current += 1;
-        if (correct) {
-          correctCharsRef.current += 1;
-        } else {
-          charErrorsRef.current[expected] = (charErrorsRef.current[expected] || 0) + 1;
-          if (expected) {
-            if (!charSubsRef.current[expected]) charSubsRef.current[expected] = {};
-            charSubsRef.current[expected][typed] = (charSubsRef.current[expected][typed] || 0) + 1;
-          }
+      // Words mode: advance progress counter and check completion
+      if (settingsRef.current.mode === 'words') {
+        setTimeLeft(nextIdx);
+        if (nextIdx >= settingsRef.current.wordCount) {
+          setTimeout(() => finishTest(), 0);
         }
       }
 
-      setCurrentInput(value);
+      setCurrentWordIdx(nextIdx);
+      setCurrentInput('');
+      return;
+    }
+
+    // Regular character typing — track stats (side effects outside setWords)
+    const prevLen = currentInput.length;
+    const newLen = value.length;
+    if (newLen > prevLen) {
+      const charIdx = newLen - 1;
+      const expected = currentWord.word[charIdx] ?? '';
+      const typed = value[charIdx];
+
+      totalCharsRef.current += 1;
+      if (typed === expected) {
+        correctCharsRef.current += 1;
+      } else {
+        charErrorsRef.current[expected] = (charErrorsRef.current[expected] || 0) + 1;
+        if (expected) {
+          if (!charSubsRef.current[expected]) charSubsRef.current[expected] = {};
+          charSubsRef.current[expected][typed] = (charSubsRef.current[expected][typed] || 0) + 1;
+        }
+      }
+    }
+
+    // Update word display state (pure — no side effects)
+    setWords(prev => {
+      if (wordIdx >= prev.length) return prev;
+      const updated = [...prev];
+      const word: WordState = {
+        ...prev[wordIdx],
+        chars: currentWord.word.split('').map((c, i) => {
+          if (i < value.length) {
+            return { char: c, status: value[i] === c ? 'correct' : 'wrong' };
+          }
+          return { char: c, status: 'untyped' };
+        }),
+      };
+      updated[wordIdx] = word;
+      wordsRef.current = updated;
       return updated;
     });
+
+    setCurrentInput(value);
   }, [currentWordIdx, currentInput, startTimer, finishTest]);
 
   return {
@@ -331,6 +353,7 @@ export function useTypingTest(settings: HookSettings) {
     handleInput,
     reset,
     undoWord,
+    finishTest,
     DURATION: settingsRef.current.duration,
   };
 }

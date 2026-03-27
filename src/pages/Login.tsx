@@ -86,7 +86,7 @@ export default function Login() {
             className="text-lg font-bold tracking-tight"
             style={{ fontFamily: 'Syne, sans-serif', color: 'var(--text)' }}
           >
-            TypeTester
+            KeyLab
           </span>
         </Link>
 
