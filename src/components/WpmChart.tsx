@@ -62,8 +62,8 @@ export default function WpmChart({ wpmTimeline, label = 'WPM Over Time' }: Props
               fontFamily: 'Space Mono',
             }}
             labelStyle={{ color: 'var(--text-dim)' }}
-            formatter={(v: number) => [v, 'WPM']}
-            labelFormatter={(l: number) => `${l}s`}
+            formatter={(v: number | undefined) => [v ?? 0, 'WPM']}
+            labelFormatter={(l: unknown) => `${l}s`}
           />
           <Area
             type="monotone"
