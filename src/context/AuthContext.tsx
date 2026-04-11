@@ -5,6 +5,7 @@ interface User {
   id: number;
   email: string;
   username: string;
+  abusiveConsent: boolean;
 }
 
 interface AuthContextType {
@@ -14,6 +15,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<void>;
   logout: () => void;
+  saveAbusiveConsent: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -87,8 +89,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     delete axios.defaults.headers.common['Authorization'];
   };
 
+  const saveAbusiveConsent = async () => {
+    await axios.post('/api/auth/abusive-consent');
+    setUser(prev => prev ? { ...prev, abusiveConsent: true } : prev);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, saveAbusiveConsent }}>
       {children}
     </AuthContext.Provider>
   );

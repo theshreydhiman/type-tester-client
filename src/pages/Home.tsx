@@ -13,7 +13,7 @@ export default function Home() {
   const {
     words, phase, timeLeft, currentWordIdx,
     currentInput, liveWpm, liveAccuracy,
-    result, handleInput, reset, undoWord,
+    result, handleInput, reset, undoWord, finishTest,
   } = useTypingTest({
     mode: settings.mode,
     language: settings.language,
@@ -55,6 +55,10 @@ export default function Home() {
       e.preventDefault();
       reset();
     }
+    if (e.key === 'Enter' && settings.mode === 'zen' && phase === 'running') {
+      e.preventDefault();
+      finishTest();
+    }
     if (e.key === 'Escape') {
       reset();
     }
@@ -67,7 +71,7 @@ export default function Home() {
 
   const modeLabel =
     settings.mode === 'words' ? `${settings.wordCount} words`
-    : settings.mode === 'zen' ? 'zen mode — press Tab to finish'
+    : settings.mode === 'zen' ? 'zen mode — press Enter to finish'
     : `${settings.mode} seconds`;
 
   if (phase === 'done') {
@@ -138,6 +142,7 @@ export default function Home() {
         {/* Keyboard hints */}
         <div className="flex items-center justify-center gap-6 mt-8">
           {[
+            ...(settings.mode === 'zen' ? [{ key: 'Enter', label: 'finish' }] : []),
             { key: 'Esc', label: 'reset' },
           ].map(({ key, label }) => (
             <span key={key} className="flex items-center gap-2" style={{ fontFamily: 'Space Mono, monospace', fontSize: '10px', color: 'var(--text-dim)', letterSpacing: '0.1em' }}>

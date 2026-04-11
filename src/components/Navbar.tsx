@@ -3,13 +3,45 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTestSettings } from '../context/TestSettingsContext';
 import type { Mode, Language } from '../context/TestSettingsContext';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, AlertTriangle } from 'lucide-react';
+import Modal from './Modal';
 
 const MODES: Mode[] = ['15', '30', '60', 'words', 'zen'];
 const LANGUAGES: Language[] = ['english', 'code', 'quotes', 'tharoor', 'potter-head', 'abusive'];
 
+const MODAL_TEXT_STYLE = {
+  color: 'var(--text-muted)',
+  fontFamily: 'Space Mono, monospace',
+  fontSize: '13px',
+  lineHeight: '1.7',
+} as const;
+
+const CANCEL_BTN_STYLE = {
+  padding: '10px 20px',
+  borderRadius: '10px',
+  border: '1px solid var(--border)',
+  background: 'transparent',
+  color: 'var(--text-muted)',
+  fontFamily: 'Space Mono, monospace',
+  fontSize: '13px',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+} as const;
+
+const CONFIRM_BTN_BASE = {
+  padding: '10px 20px',
+  borderRadius: '10px',
+  border: 'none',
+  color: '#fff',
+  fontFamily: 'Space Mono, monospace',
+  fontSize: '13px',
+  fontWeight: 600,
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+} as const;
+
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, saveAbusiveConsent } = useAuth();
   const { mode, language, setMode, setLanguage } = useTestSettings();
   const navigate = useNavigate();
   const location = useLocation();
@@ -17,6 +49,8 @@ export default function Navbar() {
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showThemeDropdown, setShowThemeDropdown] = useState(false);
+  const [showAbusiveWarning, setShowAbusiveWarning] = useState(false);
+  const [showLoginRequired, setShowLoginRequired] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const themeDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -37,6 +71,23 @@ export default function Navbar() {
     setShowDropdown(false);
     logout();
     navigate('/');
+  };
+
+  const handleLanguageSelect = (lang: Language) => {
+    if (lang === 'abusive') {
+      if (!user) {
+        setShowThemeDropdown(false);
+        setShowLoginRequired(true);
+        return;
+      }
+      if (!user.abusiveConsent) {
+        setShowThemeDropdown(false);
+        setShowAbusiveWarning(true);
+        return;
+      }
+    }
+    setLanguage(lang);
+    setShowThemeDropdown(false);
   };
 
   const modePills = isHome && (
@@ -78,7 +129,7 @@ export default function Navbar() {
             className="text-lg font-bold tracking-tight"
             style={{ fontFamily: 'Syne, sans-serif', color: 'var(--text)' }}
           >
-            TypeTester
+            KeyLab
           </span>
         </Link>
 
@@ -118,10 +169,7 @@ export default function Navbar() {
                   {LANGUAGES.map(lang => (
                     <button
                       key={lang}
-                      onClick={() => {
-                        setLanguage(lang);
-                        setShowThemeDropdown(false);
-                      }}
+                      onClick={() => handleLanguageSelect(lang)}
                       style={{
                         width: '100%',
                         padding: '10px 16px',
@@ -251,6 +299,75 @@ export default function Navbar() {
           {modePills}
         </div>
       )}
+
+      {/* Abusive theme consent modal */}
+      <Modal open={showAbusiveWarning} onClose={() => setShowAbusiveWarning(false)}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+          <AlertTriangle size={24} style={{ color: 'var(--accent2)', flexShrink: 0 }} />
+          <h3 style={{ margin: 0, fontFamily: 'Syne, sans-serif', color: 'var(--text)', fontSize: '18px' }}>
+            Content Warning
+          </h3>
+        </div>
+        <p style={{ ...MODAL_TEXT_STYLE, margin: '0 0 8px 0' }}>
+          The <strong style={{ color: 'var(--accent2)' }}>Abusive</strong> theme contains strong, explicit, and
+          potentially offensive language including profanity and slurs.
+        </p>
+        <p style={{ ...MODAL_TEXT_STYLE, margin: '0 0 24px 0' }}>
+          By proceeding, you confirm that you are <strong style={{ color: 'var(--text)' }}>18 years or older</strong> and
+          consent to viewing this content.
+        </p>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <button onClick={() => setShowAbusiveWarning(false)} style={CANCEL_BTN_STYLE}>
+            Cancel
+          </button>
+          <button
+            onClick={async () => {
+              try { await saveAbusiveConsent(); } catch { /* best effort */ }
+              setShowAbusiveWarning(false);
+              setLanguage('abusive');
+            }}
+            style={{
+              ...CONFIRM_BTN_BASE,
+              background: 'linear-gradient(135deg, var(--accent2), #e05575)',
+              boxShadow: '0 4px 14px rgba(250,109,143,0.3)',
+            }}
+          >
+            I Agree, I'm 18+
+          </button>
+        </div>
+      </Modal>
+
+      {/* Login required modal for abusive theme */}
+      <Modal open={showLoginRequired} onClose={() => setShowLoginRequired(false)}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+          <AlertTriangle size={24} style={{ color: 'var(--accent2)', flexShrink: 0 }} />
+          <h3 style={{ margin: 0, fontFamily: 'Syne, sans-serif', color: 'var(--text)', fontSize: '18px' }}>
+            Login Required
+          </h3>
+        </div>
+        <p style={{ ...MODAL_TEXT_STYLE, margin: '0 0 8px 0' }}>
+          The <strong style={{ color: 'var(--accent2)' }}>Abusive</strong> theme contains strong language and
+          is restricted to registered users who are 18+.
+        </p>
+        <p style={{ ...MODAL_TEXT_STYLE, margin: '0 0 24px 0' }}>
+          Please log in or create an account to access this theme.
+        </p>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <button onClick={() => setShowLoginRequired(false)} style={CANCEL_BTN_STYLE}>
+            Cancel
+          </button>
+          <button
+            onClick={() => { setShowLoginRequired(false); navigate('/login'); }}
+            style={{
+              ...CONFIRM_BTN_BASE,
+              background: 'linear-gradient(135deg, var(--accent), #5c4de8)',
+              boxShadow: '0 4px 14px rgba(124,109,250,0.3)',
+            }}
+          >
+            Go to Login
+          </button>
+        </div>
+      </Modal>
     </nav>
   );
 }
